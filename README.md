@@ -13,7 +13,8 @@ This project involves developing a SQL-based solution for managing data within a
 4. **Implement Advanced SQL Queries**: Craft complex queries for in-depth data analysis and retrieval.
 
 
-1. DATABASE SETUP
+1. **DATABASE SETUP**
+   
    ![ER diagram](https://github.com/user-attachments/assets/4468e3f6-1511-4e0c-874e-b5c51b2b88eb)
 
 - **Database Creation**: Created a database named `library_db`.
