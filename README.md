@@ -1,15 +1,17 @@
 # Library_Analysis_SQL
 **Database**: `library_db`
 
-This project demonstrates the implementation of a Library Management System using SQL. It includes creating and managing tables, performing CRUD operations, and executing advanced SQL queries. The goal is to showcase skills in database design, manipulation, and querying.
+This project involves developing a SQL-based solution for managing data within a library context. It includes designing relational tables, performing CRUD operations, and executing advanced queries. The objective is to demonstrate strong skills in database design, data manipulation, and query optimization in a real-world library scenario.
 
+---
 
-## Objectives
+## **Objectives**
 
-1. **Set up the Library Management System Database**: Create and populate the database with tables for branches, employees, members, books, issued status, and return status.
-2. **CRUD Operations**: Perform Create, Read, Update, and Delete operations on the data.
-3. **CTAS (Create Table As Select)**: Utilize CTAS to create new tables based on query results.
-4. **Advanced SQL Queries**: Develop complex queries to analyze and retrieve specific data.
+1. **Design and Populate the Library Database**: Create and fill tables related to branches, employees, members, books, issue records, and return records.
+2. **Perform CRUD Operations**: Execute Create, Read, Update, and Delete actions on library data.
+3. **Leverage CTAS**: Use *Create Table As Select* to generate new tables from query outputs.
+4. **Implement Advanced SQL Queries**: Craft complex queries for in-depth data analysis and retrieval.
+
 
 1. DATABASE SETUP
    ![ER diagram](https://github.com/user-attachments/assets/4468e3f6-1511-4e0c-874e-b5c51b2b88eb)
