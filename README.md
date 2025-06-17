@@ -129,6 +129,198 @@ SET SQL_SAFE_UPDATES = 0;
  DELETE FROM issued_status 
  WHERE issued_id = "IS121";
 ```
+**Task 4: Retrieve All Books Issued by a Specific Employee**
+-- Objective: Select all books issued by the employee with emp_id = 'E101'.
+```sql
+SELECT * FROM issued_status
+WHERE issued_emp_id = 'E101'
+```
+**Task 5: List Members Who Have Issued More Than One Book**
+-- Objective: Use GROUP BY to find members who have issued more than one book.
+
+```sql
+SELECT
+    issued_emp_id,
+    COUNT(*)
+FROM issued_status
+GROUP BY issued_emp_id
+HAVING COUNT(*) > 1
+```
+### 3. CTAS (Create Table As Select)
+
+- **Task 6: Create Summary Tables**: Used CTAS to generate new tables based on query results - each book and total book_issued_cnt**
+
+```sql
+CREATE TABLE book_issued_cnt AS
+SELECT b.isbn, b.book_title, COUNT(ist.issued_id) AS issue_count
+FROM issued_status as ist
+JOIN books as b
+ON ist.issued_book_isbn = b.isbn
+GROUP BY b.isbn, b.book_title;
+```
+### 4. Data Analysis & Findings
+
+The following SQL queries were used to address specific questions:
+
+Task 7. **Retrieve All Books in a Specific Category**:
+
+```sql
+SELECT * FROM books
+WHERE category = 'Classic';
+```
+
+8. **Task 8: Find Total Rental Income by Category**:
+
+```sql
+SELECT 
+    b.category,
+    SUM(b.rental_price),
+    COUNT(*)
+FROM 
+issued_status as ist
+JOIN
+books as b
+ON b.isbn = ist.issued_book_isbn
+GROUP BY 1
+```
+Task 9. **Create a Table of Books with Rental Price Above a Certain Threshold**:
+```sql
+CREATE TABLE expensive_books AS
+SELECT * FROM books
+WHERE rental_price > 7.00;
+```
+Task 10: **Retrieve the List of Books Not Yet Returned**
+```sql
+SELECT * FROM issued_status as ist
+LEFT JOIN
+return_status as rs
+ON rs.issued_id = ist.issued_id
+WHERE rs.return_id IS NULL;
+```
+**Task 11: Branch Performance Report**  
+Create a query that generates a performance report for each branch, showing the number of books issued, the number of books returned, and the total revenue generated from book rentals.
+
+```sql
+CREATE TABLE branch_reports
+AS
+SELECT 
+    b.branch_id,
+    b.manager_id,
+    COUNT(ist.issued_id) as number_book_issued,
+    COUNT(rs.return_id) as number_of_book_return,
+    SUM(bk.rental_price) as total_revenue
+FROM issued_status as ist
+JOIN 
+employees as e
+ON e.emp_id = ist.issued_emp_id
+JOIN
+branch as b
+ON e.branch_id = b.branch_id
+LEFT JOIN
+return_status as rs
+ON rs.issued_id = ist.issued_id
+JOIN 
+books as bk
+ON ist.issued_book_isbn = bk.isbn
+GROUP BY 1, 2;
+
+SELECT * FROM branch_reports;
+```
+**Task 12: Find Employees with the Most Book Issues Processed**  
+Write a query to find the top 3 employees who have processed the most book issues. Display the employee name, number of books processed, and their branch.
+
+```sql
+SELECT 
+    e.emp_name,
+    b.*,
+    COUNT(ist.issued_id) as no_book_issued
+FROM issued_status as ist
+JOIN
+employees as e
+ON e.emp_id = ist.issued_emp_id
+JOIN
+branch as b
+ON e.branch_id = b.branch_id
+GROUP BY 1, 2
+```
+**Task 13: Stored Procedure**
+Objective:
+Create a stored procedure to manage the status of books in a library system.
+Description:
+Write a stored procedure that updates the status of a book in the library based on its issuance. The procedure should function as follows:
+The stored procedure should take the book_id as an input parameter.
+The procedure should first check if the book is available (status = 'yes').
+If the book is available, it should be issued, and the status in the books table should be updated to 'no'.
+If the book is not available (status = 'no'), the procedure should return an error message indicating that the book is currently not available.
+
+```sql
+
+DELIMITER $$
+
+CREATE PROCEDURE issue_book(
+    IN p_issued_id VARCHAR(10),
+    IN p_issued_member_id VARCHAR(30),
+    IN p_issued_book_isbn VARCHAR(30),
+    IN p_issued_emp_id VARCHAR(10)
+)
+BEGIN
+    DECLARE v_status VARCHAR(10);
+
+    -- Get the book status
+    SELECT status INTO v_status
+    FROM books
+    WHERE isbn = p_issued_book_isbn;
+
+    -- Check if the book is available
+    IF v_status = 'yes' THEN
+
+        -- Insert issue record
+        INSERT INTO issued_status(
+            issued_id,
+            issued_member_id,
+            issued_date,
+            issued_book_isbn,
+            issued_emp_id
+        ) VALUES (
+            p_issued_id,
+            p_issued_member_id,
+            CURDATE(),
+            p_issued_book_isbn,
+            p_issued_emp_id
+        );
+
+        -- Update book status to 'no'
+        UPDATE books
+        SET status = 'no'
+        WHERE isbn = p_issued_book_isbn;
+
+        -- Optional: message (visible only in client tools like Workbench)
+        SELECT CONCAT('Book records added successfully for book isbn : ', p_issued_book_isbn) AS message;
+
+    ELSE
+        SELECT CONCAT('Sorry, the book is unavailable. Book ISBN: ', p_issued_book_isbn) AS message;
+    END IF;
+END$$
+
+DELIMITER ;
+
+# Testing the function
+CALL issue_book('IS155', 'C108', '978-0-553-29698-2', 'E104');
+CALL issue_book('IS156', 'C108', '978-0-375-41398-8', 'E104');
+
+SELECT * FROM books
+WHERE isbn = '978-0-375-41398-8'
+```
+
+## Reports
+
+- **Database Schema**: Detailed table structures and relationships.
+- **Data Analysis**: Insights into book categories, employee salaries, member registration trends, and issued books.
+- **Summary Reports**: Aggregated data on high-demand books and employee performance.
+
+## Conclusion
+
+This project showcases the use of SQL skills in designing and managing a library management system. It covers database creation, data manipulation, and complex querying, offering a strong foundation in data handling and analysis.
 
 
    
